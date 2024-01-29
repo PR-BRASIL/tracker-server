@@ -4,7 +4,7 @@ import { socketClient } from "./socket-client";
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
     socket.on("banLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("banLog", data);
     });
 
     socket.on("chatLog", async (data: any) => {
@@ -12,23 +12,23 @@ export const makeEvents = (server: Server) => {
     });
 
     socket.on("gameLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("gameLog", data);
     });
 
     socket.on("newPlayerProfileLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("newPlayerProfileLog", data);
     });
 
     socket.on("reportLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("reportLog", data);
     });
 
     socket.on("adminLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("adminLog", data);
     });
 
     socket.on("ticketsLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("ticketsLog", data);
     });
   });
 };
