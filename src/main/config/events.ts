@@ -1,4 +1,5 @@
 import type { Server, Socket } from "socket.io";
+import { socketClient } from "./socket-client";
 
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
@@ -7,7 +8,7 @@ export const makeEvents = (server: Server) => {
     });
 
     socket.on("chatLog", async (data: any) => {
-      console.log(data);
+      socketClient.emit("chatLog", data);
     });
 
     socket.on("gameLog", async (data: any) => {
