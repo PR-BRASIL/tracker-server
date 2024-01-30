@@ -14,8 +14,9 @@ services:
     volumes:
       - ./:/app/
     networks:
-      - pr-tracker-server_network
+      - pr-server_network
 
 networks:
-  pr-tracker-server_network:
+  pr-server_network:
+    name: pr-server-network
     driver: bridge
