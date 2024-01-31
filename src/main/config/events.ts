@@ -9,8 +9,6 @@ export const makeEvents = (server: Server) => {
     });
 
     socket.on("chatLog", async (data: any) => {
-      console.log(data);
-
       server.emit("chat", data);
     });
 
@@ -32,6 +30,14 @@ export const makeEvents = (server: Server) => {
 
     socket.on("ticketsLog", async (data: any) => {
       server.emit("ticketsLog", data);
+    });
+
+    socket.on("kill", async (data: any) => {
+      server.emit("kill", data);
+    });
+
+    socket.on("teamKill", async (data: any) => {
+      server.emit("teamKill", data);
     });
   });
 };
