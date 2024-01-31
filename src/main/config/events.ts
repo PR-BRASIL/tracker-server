@@ -39,5 +39,9 @@ export const makeEvents = (server: Server) => {
     socket.on("teamKill", async (data: any) => {
       server.emit("teamKill", data);
     });
+
+    socket.on("connectionLog", async (data: any) => {
+      server.emit("connectionLog", data);
+    });
   });
 };
