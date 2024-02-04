@@ -43,5 +43,9 @@ export const makeEvents = (server: Server) => {
     socket.on("connectionLog", async (data: any) => {
       server.emit("connectionLog", data);
     });
+
+    socket.on("gameState", (data: any) => {
+      server.emit("gameState", data);
+    });
   });
 };
