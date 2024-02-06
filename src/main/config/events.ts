@@ -10,6 +10,7 @@ import { makeTicketsLogEvent } from "../factories/tickets-log-event";
 import { makeKillLogEvent } from "../factories/kill-log-event";
 import { makeTeamKillLogEvent } from "../factories/team-kill-log-event";
 import { makeConnectionLogEvent } from "../factories/connection-log-event";
+import { makeGameStateLogEvent } from "../factories/game-state-log-event";
 
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
@@ -47,8 +48,6 @@ export const makeEvents = (server: Server) => {
       makeConnectionLogEvent().handle(data)
     );
 
-    socket.on("gameState", (data: any) => {
-      server.emit("gameState", data);
-    });
+    socket.on("gameState", (data: any) => makeGameStateLogEvent().handle(data));
   });
 };
