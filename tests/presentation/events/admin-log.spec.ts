@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { AdminLogEvent } from "../../../src/presentation/events/admin-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("AdminLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("adminLog", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("adminLog", fakeData);
   });
 });

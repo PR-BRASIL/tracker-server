@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { GameStateLogEvent } from "../../../src/presentation/events/game-state-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("GameStateLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("gameState", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("gameState", fakeData);
   });
 });

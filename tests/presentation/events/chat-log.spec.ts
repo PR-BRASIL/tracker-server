@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { ChatLogEvent } from "../../../src/presentation/events/chat-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("ChatLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("chat", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("chat", fakeData);
   });
 });

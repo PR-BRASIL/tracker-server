@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { ConnectionLogEvent } from "../../../src/presentation/events/connection-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("ConnectionLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("connectionLog", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("connectionLog", fakeData);
   });
 });

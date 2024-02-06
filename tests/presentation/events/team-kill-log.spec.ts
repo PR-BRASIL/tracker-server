@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { TeamKillLogEvent } from "../../../src/presentation/events/team-kill-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("TeamKillLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("teamKill", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("teamKill", fakeData);
   });
 });

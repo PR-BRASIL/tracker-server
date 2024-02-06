@@ -1,8 +1,8 @@
-import { server } from "../../main/config/app";
+import { io } from "../../main/config/app";
 import type { Event } from "../protocols/event";
 
 export class GameLogEvent implements Event {
   public async handle(data: any): Promise<void> {
-    server.emit("gameLog", data);
+    io.emit("gameLog", data);
   }
 }

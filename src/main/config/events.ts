@@ -13,38 +13,30 @@ import { makeConnectionLogEvent } from "../factories/connection-log-event";
 import { makeGameStateLogEvent } from "../factories/game-state-log-event";
 
 export const makeEvents = (server: Server) => {
-  server.on("connection", async (socket: Socket) => {
+  server.on("connection", (socket: Socket) => {
     logger.debug(socket.id, "Socket Id");
 
-    socket.on("banLog", async (data: any) => makeBanLogEvent().handle(data));
+    socket.on("banLog", (data: any) => makeBanLogEvent().handle(data));
 
-    socket.on("chatLog", async (data: any) => makeChatLogEvent().handle(data));
+    socket.on("chatLog", (data: any) => makeChatLogEvent().handle(data));
 
-    socket.on("gameLog", async (data: any) => makeGameLogEvent().handle(data));
+    socket.on("gameLog", (data: any) => makeGameLogEvent().handle(data));
 
-    socket.on("newPlayerProfileLog", async (data: any) =>
+    socket.on("newPlayerProfileLog", (data: any) =>
       makeNewPlayerProfileLogEvent().handle(data)
     );
 
-    socket.on("reportLog", async (data: any) =>
-      makeReportLogEvent().handle(data)
-    );
+    socket.on("reportLog", (data: any) => makeReportLogEvent().handle(data));
 
-    socket.on("adminLog", async (data: any) =>
-      makeAdminLogEvent().handle(data)
-    );
+    socket.on("adminLog", (data: any) => makeAdminLogEvent().handle(data));
 
-    socket.on("ticketsLog", async (data: any) =>
-      makeTicketsLogEvent().handle(data)
-    );
+    socket.on("ticketsLog", (data: any) => makeTicketsLogEvent().handle(data));
 
-    socket.on("kill", async (data: any) => makeKillLogEvent().handle(data));
+    socket.on("kill", (data: any) => makeKillLogEvent().handle(data));
 
-    socket.on("teamKill", async (data: any) =>
-      makeTeamKillLogEvent().handle(data)
-    );
+    socket.on("teamKill", (data: any) => makeTeamKillLogEvent().handle(data));
 
-    socket.on("connectionLog", async (data: any) =>
+    socket.on("connectionLog", (data: any) =>
       makeConnectionLogEvent().handle(data)
     );
 

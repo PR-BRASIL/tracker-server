@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { TicketsLogEvent } from "../../../src/presentation/events/tickets-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("TicketsLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("ticketsLog", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("ticketsLog", fakeData);
   });
 });

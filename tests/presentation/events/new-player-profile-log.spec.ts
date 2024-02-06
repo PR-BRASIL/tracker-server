@@ -1,8 +1,8 @@
-import { server } from "../../../src/main/config/app";
+import { io } from "../../../src/main/config/app";
 import { NewPlayerProfileLogEvent } from "../../../src/presentation/events/new-player-profile-log";
 
 jest.mock("../../../src/main/config/app", () => ({
-  server: {
+  io: {
     emit: jest.fn(),
   },
 }));
@@ -29,6 +29,6 @@ describe("NewPlayerProfileLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("newPlayerProfileLog", fakeData);
+    expect(io.emit).toHaveBeenCalledWith("newPlayerProfileLog", fakeData);
   });
 });
