@@ -2,6 +2,7 @@ import type { Server, Socket } from "socket.io";
 import { logger } from "../../utils/logger";
 import { makeBanLogEvent } from "../factories/ban-log-event";
 import { makeChatLogEvent } from "../factories/chat-log-event";
+import { makeGameLogEvent } from "../factories/game-log-event";
 
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
@@ -11,9 +12,7 @@ export const makeEvents = (server: Server) => {
 
     socket.on("chatLog", async (data: any) => makeChatLogEvent().handle(data));
 
-    socket.on("gameLog", async (data: any) => {
-      server.emit("gameLog", data);
-    });
+    socket.on("gameLog", async (data: any) => makeGameLogEvent().handle(data));
 
     socket.on("newPlayerProfileLog", async (data: any) => {
       server.emit("newPlayerProfileLog", data);
