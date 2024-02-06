@@ -4,6 +4,7 @@ import { makeBanLogEvent } from "../factories/ban-log-event";
 import { makeChatLogEvent } from "../factories/chat-log-event";
 import { makeGameLogEvent } from "../factories/game-log-event";
 import { makeNewPlayerProfileLogEvent } from "../factories/new-player-profile-log-event";
+import { makeReportLogEvent } from "../factories/report-log-event";
 
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
@@ -19,9 +20,9 @@ export const makeEvents = (server: Server) => {
       makeNewPlayerProfileLogEvent().handle(data)
     );
 
-    socket.on("reportLog", async (data: any) => {
-      server.emit("reportLog", data);
-    });
+    socket.on("reportLog", async (data: any) =>
+      makeReportLogEvent().handle(data)
+    );
 
     socket.on("adminLog", async (data: any) => {
       server.emit("adminLog", data);
