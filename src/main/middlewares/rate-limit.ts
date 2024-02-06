@@ -10,6 +10,6 @@ const SECONDS = 20;
 const MILISECONDS = 1000;
 export const rateLimitMiddleware = rateLimit({
   windowMs: MINUTES * SECONDS * MILISECONDS,
-  max: 10,
+  max: 20,
   message: "Limite de requisições excedido, tente novamente mais tarde.",
 });
