@@ -8,6 +8,7 @@ import { makeReportLogEvent } from "../factories/report-log-event";
 import { makeAdminLogEvent } from "../factories/admin-log-event";
 import { makeTicketsLogEvent } from "../factories/tickets-log-event";
 import { makeKillLogEvent } from "../factories/kill-log-event";
+import { makeTeamKillLogEvent } from "../factories/team-kill-log-event";
 
 export const makeEvents = (server: Server) => {
   server.on("connection", async (socket: Socket) => {
@@ -37,9 +38,9 @@ export const makeEvents = (server: Server) => {
 
     socket.on("kill", async (data: any) => makeKillLogEvent().handle(data));
 
-    socket.on("teamKill", async (data: any) => {
-      server.emit("teamKill", data);
-    });
+    socket.on("teamKill", async (data: any) =>
+      makeTeamKillLogEvent().handle(data)
+    );
 
     socket.on("connectionLog", async (data: any) => {
       server.emit("connectionLog", data);
