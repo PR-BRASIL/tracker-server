@@ -1,5 +1,5 @@
 import { server } from "../../../src/main/config/app";
-import { KillLogEvent } from "../../../src/presentation/events/kill-log";
+import { NewPlayerProfileLogEvent } from "../../../src/presentation/events/new-player-profile-log";
 
 jest.mock("../../../src/main/config/app", () => ({
   server: {
@@ -8,7 +8,7 @@ jest.mock("../../../src/main/config/app", () => ({
 }));
 
 const makeSut = () => {
-  const sut = new KillLogEvent();
+  const sut = new NewPlayerProfileLogEvent();
 
   return {
     sut,
@@ -19,7 +19,7 @@ const fakeData = {
   id: "fake-id",
 };
 
-describe("KillLog Event", () => {
+describe("NewPlayerProfileLog Event", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -29,6 +29,6 @@ describe("KillLog Event", () => {
 
     await sut.handle(fakeData);
 
-    expect(server.emit).toHaveBeenCalledWith("kill", fakeData);
+    expect(server.emit).toHaveBeenCalledWith("newPlayerProfileLog", fakeData);
   });
 });
