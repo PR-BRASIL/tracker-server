@@ -14,11 +14,11 @@ const makeSut = () => {
 const fakeData: Array<SaveUserDataInput> = [
   {
     name: "user_name",
-    teamWorkScore: 25,
     hash: "d71160a8da8f4f35bc3a8fef935w7646",
-    kills: 6,
-    deaths: 1,
-    score: 199,
+    teamWorkScore: 5,
+    kills: 5,
+    deaths: 5,
+    score: 5,
     ip: "111.111.11.111",
   },
 ];
@@ -30,8 +30,11 @@ describe("SaveUserDataRepository", () => {
     userCollection = await mongoHelper.getCollection("user");
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await userCollection.deleteMany({});
+  });
+
+  afterAll(async () => {
     await mongoHelper.disconnect();
   });
 
@@ -43,5 +46,28 @@ describe("SaveUserDataRepository", () => {
     const existsUser = await userCollection.findOne({ hash: fakeData[0].hash });
 
     expect(existsUser).toStrictEqual(fakeData[0]);
+  });
+
+  test("should increment score, kills, deaths, and teamWorkScore when user exists", async () => {
+    const { sut } = makeSut();
+    await userCollection.insertOne({
+      ...fakeData,
+      kills: 0,
+      deaths: 0,
+      score: 0,
+      teamWorkScore: 0,
+    });
+    await sut.save(fakeData);
+
+    const user = await userCollection.findOne({ hash: fakeData[0].hash });
+    expect(user).toBeTruthy();
+    expect(user).toStrictEqual(
+      expect.objectContaining({
+        kills: 5,
+        deaths: 5,
+        score: 5,
+        teamWorkScore: 5,
+      })
+    );
   });
 });
