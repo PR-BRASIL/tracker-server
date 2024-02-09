@@ -1,8 +1,12 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
-    roots: [
-      "./tests"
-    ]
-  };
+  roots: [
+    "./tests"
+  ],
+  testEnvironment: "node",
+  preset: "@shelf/jest-mongodb",
+  coverageDirectory: 'coverage',
+  transform: {
+    ".+\\.ts$": "ts-jest",
+  },
+};
