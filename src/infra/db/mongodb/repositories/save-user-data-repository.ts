@@ -15,22 +15,21 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
 
       if (!existsUserByHash) {
         await collection.insertOne(d);
-        return;
-      }
-
-      await collection.updateOne(
-        {
-          hash: d.hash,
-        },
-        {
-          $inc: {
-            score: d.score,
-            kills: d.kills,
-            deaths: d.deaths,
-            teamWorkScore: d.teamWorkScore,
+      } else {
+        await collection.updateOne(
+          {
+            hash: d.hash,
           },
-        }
-      );
+          {
+            $inc: {
+              score: d.score,
+              kills: d.kills,
+              deaths: d.deaths,
+              teamWorkScore: d.teamWorkScore,
+            },
+          }
+        );
+      }
     }
   }
 }

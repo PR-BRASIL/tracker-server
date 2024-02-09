@@ -21,6 +21,15 @@ const fakeData: Array<SaveUserDataInput> = [
     score: 5,
     ip: "111.111.11.111",
   },
+  {
+    name: "user_name",
+    hash: "d71160a8d12345678c3a8fef935w7646",
+    teamWorkScore: 5,
+    kills: 5,
+    deaths: 5,
+    score: 5,
+    ip: "111.111.11.111",
+  },
 ];
 
 describe("SaveUserDataRepository", () => {
@@ -43,9 +52,9 @@ describe("SaveUserDataRepository", () => {
 
     await sut.save(fakeData);
 
-    const existsUser = await userCollection.findOne({ hash: fakeData[0].hash });
+    const existsUser = await userCollection.find().toArray();
 
-    expect(existsUser).toStrictEqual(fakeData[0]);
+    expect(existsUser).toStrictEqual(fakeData);
   });
 
   test("should increment score, kills, deaths, and teamWorkScore when user exists", async () => {

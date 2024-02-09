@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  mongodb:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=database
+      - MONGODB_DATA_DIR=/data/db
+      - MONDODB_LOG_DIR=/dev/null
+    volumes:
+      - mongo:/data/db
+    networks:
+      - pr-server_network
+
   client:
     env_file:
       - .env
@@ -15,6 +28,9 @@ services:
       - ./:/app/
     networks:
       - pr-server_network
+
+volumes:
+  mongo:
 
 networks:
   pr-server_network:
