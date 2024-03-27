@@ -16,7 +16,7 @@ services:
 
   client:
     env_file:
-      - .env
+      - .env.docker
     build:
       context: "."
       dockerfile: Dockerfile
