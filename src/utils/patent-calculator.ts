@@ -133,13 +133,13 @@ export class PatentCalculator {
   private getProgressBar(
     currentValue: number,
     desiredValue: number,
-    barSize: number = 10
+    barSize: number = 30
   ): string {
     if (currentValue < 0 || currentValue > desiredValue) {
       // Handle edge cases
       return currentValue >= desiredValue
-        ? "[##########] MAX"
-        : "[..........] 0/0";
+        ? "[##############################] MAX"
+        : "[..............................] 0/0";
     }
 
     const progressPercent = Math.min(1, currentValue / desiredValue);
