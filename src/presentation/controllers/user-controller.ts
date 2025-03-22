@@ -20,14 +20,39 @@ export class UserController {
       }
 
       const collection = await mongoHelper.getCollection("user");
+      const searchQuery = query.toString();
 
-      // Busca o usuário pelo hash ou nome (insensível a maiúsculas/minúsculas)
-      const user = await collection.findOne({
-        $or: [
-          { hash: query.toString() },
-          { name: { $regex: new RegExp(`^${query.toString()}$`, "i") } },
-        ],
-      });
+      // Usando regex mais flexível, similar ao MongoSaveUserDataRepository
+      const regex = new RegExp(searchQuery, "i");
+
+      // Primeiro, tenta buscar todos que correspondem ao padrão (nome ou hash)
+      const users = await collection
+        .find({
+          $or: [{ name: regex }, { hash: searchQuery }],
+        })
+        .toArray();
+
+      let user = null;
+
+      // Se encontrou exatamente um usuário, use-o
+      if (users.length === 1) {
+        user = users[0];
+      }
+      // Se encontrou vários, procura pela correspondência exata de nome
+      else if (users.length > 1) {
+        user = users.find(
+          (u) => searchQuery.toLowerCase() === u.name.toLowerCase()
+        );
+
+        // Se não encontrou por nome exato, usa o primeiro resultado
+        if (!user) {
+          user = users[0];
+        }
+      }
+      // Caso não tenha encontrado nenhum, tenta buscar especificamente pelo hash
+      else {
+        user = await collection.findOne({ hash: searchQuery });
+      }
 
       if (!user) {
         res.status(404).json({ error: "Usuário não encontrado" });
@@ -44,11 +69,15 @@ export class UserController {
         user.score || 0
       );
 
+      // Calcula o rank do usuário
+      const userRank = await this.getUserRank(collection, user.hash);
+
       // Retorna os dados solicitados
       res.status(200).json({
         name: user.name,
         patent,
         text: progressText,
+        rank: userRank,
         // Incluímos estatísticas adicionais para referência
         stats: {
           score: user.score || 0,
@@ -61,5 +90,17 @@ export class UserController {
       console.error("Erro ao buscar usuário:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
+  }
+
+  /**
+   * Calcula o rank do usuário com base no score
+   */
+  private async getUserRank(
+    collection: any,
+    userHash: string
+  ): Promise<number> {
+    const result = await collection.find({}).sort({ score: -1 }).toArray();
+
+    return result.findIndex((user: any) => user.hash === userHash) + 1;
   }
 }
