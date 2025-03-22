@@ -11,15 +11,20 @@ export class GameLogEvent implements Event {
   public async handle(data: any): Promise<void> {
     const isBrazilianBonusTime = this.isBetween7amAnd2pm();
     const dataFormat: Array<SaveUserDataInput> = data.Players.map(
-      (player: any) => ({
-        name: player.Name,
-        ip: player.IP,
-        teamWorkScore: player.ScoreTW,
-        hash: player.Hash,
-        kills: player.Kills,
-        deaths: player.Deaths,
-        score: isBrazilianBonusTime ? player.Score * 2 : player.Score,
-      })
+      (player: any) => {
+        const playTime = player.DisconnectTime - player.JoinTime;
+
+        return {
+          name: player.Name,
+          ip: player.IP,
+          teamWorkScore: player.ScoreTW,
+          hash: player.Hash,
+          kills: player.Kills,
+          deaths: player.Deaths,
+          score: isBrazilianBonusTime ? player.Score * 2 : player.Score,
+          time: playTime,
+        };
+      }
     );
     await this.saveUserData.save(dataFormat);
     io.emit("gameLog", data);

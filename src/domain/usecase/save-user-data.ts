@@ -6,6 +6,7 @@ export interface SaveUserDataInput {
   deaths: number;
   score: number;
   teamWorkScore: number;
+  time?: number; // Tempo de jogo da sessão atual
 }
 
 export interface SaveUserData {
