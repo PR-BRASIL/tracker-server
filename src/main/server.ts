@@ -17,4 +17,5 @@ server.listen(env.port, async () => {
   if (!mongoConectionCheck) return logger.fatal("Error in Mongodb connection");
 
   logger.info("listening on port " + env.port);
+  logger.info("API available at: http://localhost:" + env.port + "/api");
 });

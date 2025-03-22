@@ -29,7 +29,7 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
               kills: d.kills,
               deaths: d.deaths,
               teamWorkScore: d.teamWorkScore,
-              totalTime: d.time || 0,
+              // totalTime: d.time || 0,
             },
           }
         );

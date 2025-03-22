@@ -6,9 +6,14 @@ import { env } from "./env";
 import http from "http";
 import fs from "fs";
 import { rateLimitMiddleware } from "../middlewares/rate-limit";
+import { setupRoutes } from "./routes";
 
 const app = express();
 app.use(rateLimitMiddleware);
+app.use(express.json());
+// Configura as rotas
+setupRoutes(app);
+
 let server: any;
 
 if (env.cert && env.key) {
@@ -26,4 +31,4 @@ if (env.cert && env.key) {
 export const io = new Server(server);
 makeEvents(io);
 
-export { server };
+export { server, app };
