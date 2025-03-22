@@ -12,7 +12,7 @@ export class GameLogEvent implements Event {
     const isBrazilianBonusTime = this.isBetween7amAnd2pm();
     const dataFormat: Array<SaveUserDataInput> = data.Players.map(
       (player: any) => {
-        const playTime = player.DisconnectTime - player.JoinTime;
+        const playTime = Math.max(0, player.DisconnectTime - player.JoinTime);
 
         return {
           name: player.Name,

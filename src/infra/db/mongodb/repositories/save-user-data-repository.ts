@@ -24,9 +24,6 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
             $set: {
               name: d.name,
             },
-            $setOnInsert: {
-              totalTime: 0,
-            },
             $inc: {
               score: d.score,
               kills: d.kills,
