@@ -21,6 +21,9 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
             hash: d.hash,
           },
           {
+            $set: {
+              name: d.name,
+            },
             $inc: {
               score: d.score,
               kills: d.kills,
