@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import { mongoHelper } from "../../infra/db/mongodb/helpers/mongo-helper";
-import {
-  calculatePatent,
-  calculateProgressText,
-} from "../../utils/patent-calculator";
+import { PatentCalculator } from "../../utils/patent-calculator";
 
 export class UserController {
+  private patentCalculator: PatentCalculator;
+
+  constructor() {
+    this.patentCalculator = new PatentCalculator();
+  }
+
   async getUserByHashOrName(req: Request, res: Response): Promise<void> {
     try {
       // Permite consulta via query param ou parâmetro de rota
@@ -32,10 +35,14 @@ export class UserController {
       }
 
       // Calcula a patente com base na pontuação
-      const patent = calculatePatent(user.score || 0);
+      const patent = await this.patentCalculator.calculatePatent(
+        user.score || 0
+      );
 
       // Calcula o texto de progresso
-      const progressText = calculateProgressText(user.score || 0);
+      const progressText = await this.patentCalculator.calculateProgressText(
+        user.score || 0
+      );
 
       // Retorna os dados solicitados
       res.status(200).json({
