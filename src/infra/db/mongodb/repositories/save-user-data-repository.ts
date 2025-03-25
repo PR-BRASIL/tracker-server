@@ -5,7 +5,24 @@ import type {
 import { mongoHelper } from "../helpers/mongo-helper";
 
 export class MongoSaveUserDataRepository implements SaveUserDataRepository {
-  public async save(data: Array<SaveUserDataRepositoryInput>): Promise<void> {
+  public async save(
+    data: Array<SaveUserDataRepositoryInput>,
+    path: string
+  ): Promise<void> {
+    const pathCollection = await mongoHelper.getCollection("path");
+
+    const pathExists = await pathCollection.findOne({
+      path,
+    });
+
+    if (pathExists) {
+      return;
+    }
+
+    await pathCollection.insertOne({
+      path,
+    });
+
     const collection = await mongoHelper.getCollection("user");
 
     for (const d of data) {

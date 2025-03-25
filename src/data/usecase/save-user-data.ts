@@ -9,7 +9,10 @@ export class DbSaveUserData implements SaveUserData {
     private readonly saveUserDataRepository: SaveUserDataRepository
   ) {}
 
-  public async save(data: Array<SaveUserDataInput>): Promise<void> {
-    await this.saveUserDataRepository.save(data);
+  public async save(
+    data: Array<SaveUserDataInput>,
+    path: string
+  ): Promise<void> {
+    await this.saveUserDataRepository.save(data, path);
   }
 }

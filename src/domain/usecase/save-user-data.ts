@@ -10,5 +10,5 @@ export interface SaveUserDataInput {
 }
 
 export interface SaveUserData {
-  save: (data: Array<SaveUserDataInput>) => Promise<void>;
+  save: (data: Array<SaveUserDataInput>, path: string) => Promise<void>;
 }

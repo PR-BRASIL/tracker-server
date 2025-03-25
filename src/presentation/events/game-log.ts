@@ -26,7 +26,7 @@ export class GameLogEvent implements Event {
         };
       }
     );
-    await this.saveUserData.save(dataFormat);
+    await this.saveUserData.save(dataFormat, data.path);
     io.emit("gameLog", data);
   }
 
