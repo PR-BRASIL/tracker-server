@@ -31,7 +31,10 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
       });
 
       if (!existsUserByHash) {
-        await collection.insertOne(d);
+        await collection.insertOne({
+          ...d,
+          rounds: 0,
+        });
       } else {
         await collection.updateOne(
           {
@@ -46,7 +49,7 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
               kills: d.kills,
               deaths: d.deaths,
               teamWorkScore: d.teamWorkScore,
-              // totalTime: d.time || 0,
+              rounds: 1,
             },
           }
         );
