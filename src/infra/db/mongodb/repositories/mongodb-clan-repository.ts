@@ -57,14 +57,9 @@ export class MongoDbClanRepository implements ClanRepository {
     return clans.map((clan) => mongoHelper.map(clan));
   }
 
-  async removeHashFromClan(
-    hash: string,
-    exceptClanName?: string
-  ): Promise<void> {
+  async removeHashFromClan(hash: string): Promise<void> {
     const collection = await this.getCollection();
 
-    const query = exceptClanName ? { name: { $ne: exceptClanName } } : {};
-
-    await collection.updateMany(query, { $pull: { membersHash: hash } as any });
+    await collection.updateMany({}, { $pull: { membersHash: hash } as any });
   }
 }
