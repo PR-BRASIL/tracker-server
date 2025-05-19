@@ -83,8 +83,11 @@ export class GameLogEvent implements Event {
       }
     }
 
+    // First, wait for all hash removals to complete
+    await Promise.all(hashRemovalPromises);
+
+    // Then save clan data and user data
     await Promise.all([
-      ...hashRemovalPromises,
       this.saveClanData.saveMany(clanData),
       this.saveUserData.save(dataFormat, data.path),
     ]);
