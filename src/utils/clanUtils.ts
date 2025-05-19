@@ -29,7 +29,7 @@ const clanTagList: string[] = [
   "L|w",
   "OP|",
   "LDH",
-  "-LAM",
+  "E-LAM",
   "FAL",
   "SAE",
   "SDC",
