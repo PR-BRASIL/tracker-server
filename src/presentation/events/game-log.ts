@@ -2,7 +2,7 @@ import type {
   SaveUserData,
   SaveUserDataInput,
 } from "../../domain/usecase/save-user-data";
-import { MongoDbClanRepository } from "../../infra/repositories/mongodb-clan-repository";
+import { MongoDbClanRepository } from "../../infra/db/mongodb/repositories/mongodb-clan-repository";
 import { io } from "../../main/config/app";
 import { extractClanName } from "../../utils/clanUtils";
 import type { Event } from "../protocols/event";

@@ -1,7 +1,7 @@
 import { Collection } from "mongodb";
-import { mongoHelper } from "../db/mongodb/helpers/mongo-helper";
-import { Clan, SaveClanData } from "../../data/models/clan";
-import { ClanRepository } from "../../data/protocols/clan-repository";
+import { mongoHelper } from "../helpers/mongo-helper";
+import { Clan, SaveClanData } from "../../../../data/models/clan";
+import { ClanRepository } from "../../../../data/protocols/clan-repository";
 
 export class MongoDbClanRepository implements ClanRepository {
   private async getCollection(): Promise<Collection> {
