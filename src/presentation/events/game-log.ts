@@ -2,11 +2,16 @@ import type {
   SaveUserData,
   SaveUserDataInput,
 } from "../../domain/usecase/save-user-data";
+import { MongoDbClanRepository } from "../../infra/repositories/mongodb-clan-repository";
 import { io } from "../../main/config/app";
+import { extractClanName } from "../../utils/clanUtils";
 import type { Event } from "../protocols/event";
 
 export class GameLogEvent implements Event {
-  public constructor(private readonly saveUserData: SaveUserData) {}
+  public constructor(
+    private readonly saveUserData: SaveUserData,
+    private readonly saveClanData: MongoDbClanRepository
+  ) {}
 
   public async handle(data: any): Promise<void> {
     const isBrazilianBonusTime = this.isBetween7amAnd2pm();
@@ -26,7 +31,31 @@ export class GameLogEvent implements Event {
         };
       }
     );
-    await this.saveUserData.save(dataFormat, data.path);
+
+    interface ClanData {
+      name: string;
+      points: number;
+    }
+
+    const clanData: ClanData[] = [];
+    for (const player of data.Players) {
+      const clanName = extractClanName(player.Name);
+      if (clanName) {
+        const clan = clanData.find((c) => c.name === clanName);
+        const score = isBrazilianBonusTime ? player.Score * 2 : player.Score;
+        if (clan) {
+          clan.points += score;
+        } else {
+          clanData.push({ name: clanName, points: score });
+        }
+      }
+    }
+
+    Promise.all([
+      this.saveClanData.saveMany(clanData),
+      this.saveUserData.save(dataFormat, data.path),
+    ]);
+
     io.emit("gameLog", data);
   }
 
