@@ -69,9 +69,11 @@ export class GameLogEvent implements Event {
     // Process players who need their hash removed from other clans
     const hashRemovalPromises = [];
     for (const [playerHash, clanName] of playerHashes) {
+      // First do a complete removal from all clans to handle clan switching
       hashRemovalPromises.push(
-        this.saveClanData.removeHashFromClan(playerHash, clanName)
+        this.saveClanData.removeHashFromClan(playerHash)
       );
+      // Then allow it to be added back to the current clan during saveMany
     }
 
     // Remove players not in any clan from all clans
