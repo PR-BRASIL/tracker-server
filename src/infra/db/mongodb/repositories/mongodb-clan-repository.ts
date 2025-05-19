@@ -9,16 +9,40 @@ export class MongoDbClanRepository implements ClanRepository {
   }
 
   async saveMany(data: SaveClanData[]): Promise<void> {
+    if (!data.length) return;
+
     const collection = await this.getCollection();
     const now = new Date();
 
-    const clanData = data.map((clan) => ({
-      ...clan,
-      createdAt: now,
-      updatedAt: now,
-    }));
+    for (const clanData of data) {
+      const existingClan = await collection.findOne({ name: clanData.name });
 
-    await collection.insertMany(clanData);
+      if (existingClan) {
+        // Update existing clan
+        const updateData: any = {
+          $inc: { points: clanData.points },
+          $set: { updatedAt: now },
+        };
+
+        // If membersHash exists, add to array avoiding duplicates
+        if (clanData.membersHash && clanData.membersHash.length > 0) {
+          updateData.$addToSet = {
+            membersHash: { $each: clanData.membersHash },
+          };
+        }
+
+        await collection.updateOne({ name: clanData.name }, updateData);
+      } else {
+        // Create new clan
+        await collection.insertOne({
+          name: clanData.name,
+          points: clanData.points,
+          membersHash: clanData.membersHash || [],
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    }
   }
 
   async findByName(name: string): Promise<Clan | null> {
@@ -31,5 +55,16 @@ export class MongoDbClanRepository implements ClanRepository {
     const collection = await this.getCollection();
     const clans = await collection.find().toArray();
     return clans.map((clan) => mongoHelper.map(clan));
+  }
+
+  async removeHashFromClan(
+    hash: string,
+    exceptClanName?: string
+  ): Promise<void> {
+    const collection = await this.getCollection();
+
+    const query = exceptClanName ? { name: { $ne: exceptClanName } } : {};
+
+    await collection.updateMany(query, { $pull: { membersHash: hash } as any });
   }
 }

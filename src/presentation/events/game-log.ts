@@ -35,23 +35,56 @@ export class GameLogEvent implements Event {
     interface ClanData {
       name: string;
       points: number;
+      membersHash: string[];
     }
 
     const clanData: ClanData[] = [];
+    const playerHashes = new Map<string, string>(); // Map to track player hash to clan name
+
     for (const player of data.Players) {
       const clanName = extractClanName(player.Name);
+      const playerHash = player.Hash;
+
       if (clanName) {
         const clan = clanData.find((c) => c.name === clanName);
         const score = isBrazilianBonusTime ? player.Score * 2 : player.Score;
+
         if (clan) {
           clan.points += score;
+          if (!clan.membersHash.includes(playerHash)) {
+            clan.membersHash.push(playerHash);
+          }
         } else {
-          clanData.push({ name: clanName, points: score });
+          clanData.push({
+            name: clanName,
+            points: score,
+            membersHash: [playerHash],
+          });
         }
+
+        playerHashes.set(playerHash, clanName);
+      }
+    }
+
+    // Process players who need their hash removed from other clans
+    const hashRemovalPromises = [];
+    for (const [playerHash, clanName] of playerHashes) {
+      hashRemovalPromises.push(
+        this.saveClanData.removeHashFromClan(playerHash, clanName)
+      );
+    }
+
+    // Remove players not in any clan from all clans
+    for (const player of data.Players) {
+      if (!playerHashes.has(player.Hash)) {
+        hashRemovalPromises.push(
+          this.saveClanData.removeHashFromClan(player.Hash)
+        );
       }
     }
 
     await Promise.all([
+      ...hashRemovalPromises,
       this.saveClanData.saveMany(clanData),
       this.saveUserData.save(dataFormat, data.path),
     ]);
