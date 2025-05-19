@@ -51,7 +51,7 @@ export class GameLogEvent implements Event {
       }
     }
 
-    Promise.all([
+    await Promise.all([
       this.saveClanData.saveMany(clanData),
       this.saveUserData.save(dataFormat, data.path),
     ]);
