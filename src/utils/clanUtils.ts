@@ -7,7 +7,7 @@
  */
 const clanTagList: string[] = [
   "SPTS",
-  "-COM",
+  "CT-COM",
   "=SF=",
   "=SD=",
   "SUS",
@@ -79,7 +79,6 @@ const clanTagList: string[] = [
   "MCMK",
   "BTHP",
   "BRM",
-  "55",
 ];
 
 export function extractClanName(userName: string): string | null {
