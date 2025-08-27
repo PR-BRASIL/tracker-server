@@ -34,6 +34,8 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
         await collection.insertOne({
           ...d,
           rounds: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       } else {
         await collection.updateOne(
@@ -43,6 +45,7 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
           {
             $set: {
               name: d.name,
+              updatedAt: new Date(),
             },
             $inc: {
               score: d.score,
