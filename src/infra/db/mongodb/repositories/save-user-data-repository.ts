@@ -3,6 +3,7 @@ import type {
   SaveUserDataRepositoryInput,
 } from "../../../../data/protocols/save-user-data-repository";
 import { mongoHelper } from "../helpers/mongo-helper";
+import type { Collection } from "mongodb";
 
 export class MongoSaveUserDataRepository implements SaveUserDataRepository {
   public async save(
@@ -23,52 +24,52 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
       path,
     });
 
-    const collection = await mongoHelper.getCollection("user");
     const collectionUserTemp = await mongoHelper.getCollection("monthly_user");
+    const collectionUser = await mongoHelper.getCollection("user");
 
     for (const d of data) {
-      const existsUserByHash = await collection.findOne({
-        hash: d.hash,
-      });
+      await this.updateUser(d, collectionUserTemp);
+      await this.updateUser(d, collectionUser);
+    }
+  }
 
-      if (!existsUserByHash) {
-        const data = {
-          ...d,
-          rounds: 0,
-          createdAt: new Date(),
+  private async updateUser(
+    d: SaveUserDataRepositoryInput,
+    collection: Collection
+  ): Promise<void> {
+    const existsUserByHash = await collection.findOne({
+      hash: d.hash,
+    });
+
+    if (!existsUserByHash) {
+      const data = {
+        ...d,
+        rounds: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      await collection.insertOne(data);
+    } else {
+      const data = {
+        $set: {
+          name: d.name,
           updatedAt: new Date(),
-        };
-        await collection.insertOne(data);
-        await collectionUserTemp.insertOne(data);
-      } else {
-        const data = {
-          $set: {
-            name: d.name,
-            updatedAt: new Date(),
-          },
-          $inc: {
-            score: d.score,
-            kills: d.kills,
-            deaths: d.deaths,
-            teamWorkScore: d.teamWorkScore,
-            rounds: 1,
-          },
-        };
+        },
+        $inc: {
+          score: d.score,
+          kills: d.kills,
+          deaths: d.deaths,
+          teamWorkScore: d.teamWorkScore,
+          rounds: 1,
+        },
+      };
 
-        await collection.updateOne(
-          {
-            hash: d.hash,
-          },
-          data
-        );
-
-        await collectionUserTemp.updateOne(
-          {
-            hash: d.hash,
-          },
-          data
-        );
-      }
+      await collection.updateOne(
+        {
+          hash: d.hash,
+        },
+        data
+      );
     }
   }
 }
