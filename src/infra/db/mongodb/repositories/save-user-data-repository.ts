@@ -24,6 +24,7 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
     });
 
     const collection = await mongoHelper.getCollection("user");
+    const collectionUserTemp = await mongoHelper.getCollection("monthly_user");
 
     for (const d of data) {
       const existsUserByHash = await collection.findOne({
@@ -31,30 +32,41 @@ export class MongoSaveUserDataRepository implements SaveUserDataRepository {
       });
 
       if (!existsUserByHash) {
-        await collection.insertOne({
+        const data = {
           ...d,
           rounds: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        };
+        await collection.insertOne(data);
+        await collectionUserTemp.insertOne(data);
       } else {
+        const data = {
+          $set: {
+            name: d.name,
+            updatedAt: new Date(),
+          },
+          $inc: {
+            score: d.score,
+            kills: d.kills,
+            deaths: d.deaths,
+            teamWorkScore: d.teamWorkScore,
+            rounds: 1,
+          },
+        };
+
         await collection.updateOne(
           {
             hash: d.hash,
           },
+          data
+        );
+
+        await collectionUserTemp.updateOne(
           {
-            $set: {
-              name: d.name,
-              updatedAt: new Date(),
-            },
-            $inc: {
-              score: d.score,
-              kills: d.kills,
-              deaths: d.deaths,
-              teamWorkScore: d.teamWorkScore,
-              rounds: 1,
-            },
-          }
+            hash: d.hash,
+          },
+          data
         );
       }
     }
