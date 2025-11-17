@@ -13,4 +13,9 @@ export default (router: Router): void => {
   router.get("/user/:query", (req, res) =>
     userController.getUserByHashOrName(req, res)
   );
+
+  // Rota para obter os 3 primeiros colocados do ranking mensal
+  router.get("/monthly-top-players", (req, res) =>
+    userController.getMonthlyTopThree(req, res)
+  );
 };
