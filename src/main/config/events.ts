@@ -28,7 +28,10 @@ export const makeEvents = (server: Server) => {
 
     socket.on("reportLog", (data: any) => makeReportLogEvent().handle(data));
 
-    socket.on("adminLog", (data: any) => makeAdminLogEvent().handle(data));
+    socket.on("adminLog", (data: any) => {
+      console.log("adminLog", data);
+      makeAdminLogEvent().handle(data);
+    });
 
     socket.on("ticketsLog", (data: any) => makeTicketsLogEvent().handle(data));
 
