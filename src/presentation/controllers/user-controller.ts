@@ -122,6 +122,7 @@ export class UserController {
           // totalTime: user.totalTime || 0,
         },
         monthly: monthlyData,
+        discordId: user.discordUserId || null,
       });
     } catch (error) {
       console.error("Erro ao buscar usuário:", error);
