@@ -81,6 +81,10 @@ const clanTagList: string[] = [
   "BRM",
 ];
 
+const clanAliasMap: Record<string, string> = {
+  "=|": "=SF=",
+};
+
 export function extractClanName(userName: string): string | null {
   if (!userName) return null;
 
@@ -107,7 +111,9 @@ export function extractClanName(userName: string): string | null {
   }
 
   if (tag == "") return null;
-  else return tag;
+
+  const normalizedTag = clanAliasMap[tag] || tag;
+  return normalizedTag;
 }
 
 /**
