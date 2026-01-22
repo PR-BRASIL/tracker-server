@@ -14,6 +14,11 @@ export default (router: Router): void => {
     userController.getUserByHashOrName(req, res)
   );
 
+  // Rota para buscar múltiplos usuários por hash (?hash=hash1,hash2,hash3)
+  router.get("/users-by-hashes", (req, res) =>
+    userController.getUsersByHashes(req, res)
+  );
+
   // Rota para obter os 3 primeiros colocados do ranking mensal
   router.get("/monthly-top-players", (req, res) =>
     userController.getMonthlyTopThree(req, res)

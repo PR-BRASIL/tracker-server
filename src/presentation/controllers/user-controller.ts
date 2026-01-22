@@ -175,6 +175,124 @@ export class UserController {
   }
 
   /**
+   * Busca múltiplos usuários por hash usando query parameter
+   * Exemplo: ?hash=hash1,hash2,hash3
+   */
+  async getUsersByHashes(req: Request, res: Response): Promise<void> {
+    try {
+      const hashParam = req.query.hash;
+
+      if (!hashParam) {
+        res.status(400).json({ error: "Parâmetro hash é obrigatório" });
+        return;
+      }
+
+      // Separa os hashes por vírgula e remove espaços em branco
+      const hashes = hashParam
+        .toString()
+        .split(",")
+        .map((h) => h.trim())
+        .filter((h) => h.length > 0);
+
+      if (hashes.length === 0) {
+        res.status(400).json({ error: "Pelo menos um hash deve ser fornecido" });
+        return;
+      }
+
+      const collection = await mongoHelper.getCollection("user");
+      const monthlyCollection = await mongoHelper.getCollection("monthly_user");
+
+      // Busca todos os usuários com os hashes fornecidos
+      const users = await collection
+        .find({
+          hash: { $in: hashes },
+        })
+        .toArray();
+
+      if (!users || users.length === 0) {
+        res.status(404).json({ error: "Nenhum usuário encontrado" });
+        return;
+      }
+
+      // Formata os dados de cada usuário
+      const formattedUsers = await Promise.all(
+        users.map(async (user) => {
+          // Busca dados mensais do usuário
+          const monthlyUser = await monthlyCollection.findOne({
+            hash: user.hash,
+          });
+
+          // Calcula a patente com base na pontuação
+          const patent = await this.patentCalculator.calculatePatent(
+            user.score || 0
+          );
+
+          // Obtém o nome da patente
+          const patentName = (await this.getPatentName(user.score || 0)).split(
+            " <"
+          )[0];
+
+          // Calcula o texto de progresso
+          const progressText = await this.patentCalculator.calculateProgressText(
+            user.score || 0
+          );
+
+          // Calcula o rank do usuário
+          const userRank = await this.getUserRank(collection, user.hash);
+
+          // Calcula informações mensais
+          let monthlyData = null;
+          if (monthlyUser) {
+            const monthlyPatent = await this.patentCalculator.calculatePatent(
+              monthlyUser.score || 0
+            );
+            const monthlyPatentName = (
+              await this.getPatentName(monthlyUser.score || 0)
+            ).split(" <")[0];
+            const monthlyRank = await this.getUserRank(
+              monthlyCollection,
+              user.hash
+            );
+
+            monthlyData = {
+              score: monthlyUser.score || 0,
+              kills: monthlyUser.kills || 0,
+              deaths: monthlyUser.deaths || 0,
+              patent: monthlyPatent,
+              patentName: monthlyPatentName,
+              rank: monthlyRank,
+            };
+          }
+
+          return {
+            name: user.name,
+            hash: user.hash,
+            patent,
+            patentName,
+            text: progressText,
+            rank: userRank,
+            stats: {
+              score: user.score || 0,
+              kills: user.kills || 0,
+              deaths: user.deaths || 0,
+            },
+            monthly: monthlyData,
+            discordId: user.discordUserId || null,
+          };
+        })
+      );
+
+      res.status(200).json({
+        users: formattedUsers,
+        count: formattedUsers.length,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar usuários por hash:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  }
+
+  /**
    * Retorna os 3 primeiros colocados do ranking mensal
    */
   async getMonthlyTopThree(req: Request, res: Response): Promise<void> {
