@@ -187,27 +187,55 @@ export class UserController {
         return;
       }
 
-      // Separa os hashes por vírgula e remove espaços em branco
-      const hashes = hashParam
+      // Separa os termos (hashes ou nomes) por vírgula e remove espaços em branco
+      const searchTerms = hashParam
         .toString()
         .split(",")
         .map((h) => h.trim())
         .filter((h) => h.length > 0);
 
-      if (hashes.length === 0) {
-        res.status(400).json({ error: "Pelo menos um hash deve ser fornecido" });
+      if (searchTerms.length === 0) {
+        res.status(400).json({ error: "Pelo menos um termo de busca deve ser fornecido" });
         return;
       }
 
       const collection = await mongoHelper.getCollection("user");
       const monthlyCollection = await mongoHelper.getCollection("monthly_user");
 
-      // Busca todos os usuários com os hashes fornecidos
-      const users = await collection
-        .find({
-          hash: { $in: hashes },
-        })
-        .toArray();
+      let finalUsers: any[] = [];
+
+      for (const term of searchTerms) {
+        let regex;
+        try {
+          regex = new RegExp(term, "i");
+        } catch (e) {
+          regex = new RegExp(term.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&"), "i");
+        }
+
+        const matchedUsers = await collection
+          .find({
+            $or: [{ name: regex }, { hash: term }],
+          })
+          .toArray();
+
+        if (matchedUsers.length > 0) {
+          const exactMatches = matchedUsers.filter(
+            (u) =>
+              u.hash === term ||
+              (u.name && u.name.toLowerCase() === term.toLowerCase())
+          );
+
+          const usersToAdd = exactMatches.length > 0 ? exactMatches : matchedUsers;
+
+          for (const u of usersToAdd) {
+            if (!finalUsers.find((existing) => existing.hash === u.hash)) {
+              finalUsers.push(u);
+            }
+          }
+        }
+      }
+
+      const users = finalUsers;
 
       if (!users || users.length === 0) {
         res.status(404).json({ error: "Nenhum usuário encontrado" });
