@@ -6,6 +6,20 @@ export const mongoHelper = {
   client: null as MongoClient,
   async connect(url?: string): Promise<void> {
     this.client = await new MongoClient(url || env.mongoUrl).connect();
+
+    try {
+      const db = this.client.db();
+      // Cria índices para as coleções user e monthly_user para otimizar busca e ordenação
+      await db.collection("user").createIndex({ hash: 1 }, { background: true });
+      await db.collection("user").createIndex({ score: -1 }, { background: true });
+      await db.collection("user").createIndex({ name: 1 }, { background: true });
+
+      await db.collection("monthly_user").createIndex({ hash: 1 }, { background: true });
+      await db.collection("monthly_user").createIndex({ score: -1 }, { background: true });
+      await db.collection("monthly_user").createIndex({ name: 1 }, { background: true });
+    } catch (e) {
+      console.warn("Aviso ao criar índices no MongoDB:", e);
+    }
   },
 
   async disconnect(): Promise<void> {

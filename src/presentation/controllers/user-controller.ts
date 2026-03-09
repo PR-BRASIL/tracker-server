@@ -81,7 +81,7 @@ export class UserController {
       );
 
       // Calcula o rank do usuário
-      const userRank = await this.getUserRank(collection, user.hash);
+      const userRank = await this.getUserRank(collection, user.score || 0);
 
       // Calcula informações mensais
       let monthlyData = null;
@@ -94,7 +94,7 @@ export class UserController {
         ).split(" <")[0];
         const monthlyRank = await this.getUserRank(
           monthlyCollection,
-          user.hash
+          monthlyUser.score || 0
         );
 
         monthlyData = {
@@ -167,11 +167,13 @@ export class UserController {
    */
   private async getUserRank(
     collection: any,
-    userHash: string
+    score: number
   ): Promise<number> {
-    const result = await collection.find({}).sort({ score: -1 }).toArray();
+    const higherScoreCount = await collection.countDocuments({
+      score: { $gt: score }
+    });
 
-    return result.findIndex((user: any) => user.hash === userHash) + 1;
+    return higherScoreCount + 1;
   }
 
   /**
@@ -266,7 +268,7 @@ export class UserController {
           );
 
           // Calcula o rank do usuário
-          const userRank = await this.getUserRank(collection, user.hash);
+          const userRank = await this.getUserRank(collection, user.score || 0);
 
           // Calcula informações mensais
           let monthlyData = null;
@@ -279,7 +281,7 @@ export class UserController {
             ).split(" <")[0];
             const monthlyRank = await this.getUserRank(
               monthlyCollection,
-              user.hash
+              monthlyUser.score || 0
             );
 
             monthlyData = {
