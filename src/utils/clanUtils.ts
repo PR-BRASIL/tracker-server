@@ -79,6 +79,7 @@ const clanTagList: string[] = [
   "MCMK",
   "BTHP",
   "BRM",
+  "75th'"
 ];
 
 const clanAliasMap: Record<string, string> = {
