@@ -19,6 +19,8 @@ export class GameLogEvent implements Event {
       (player: any) => {
         const playTime = Math.max(0, player.DisconnectTime - player.JoinTime);
 
+        const baseScore = isBrazilianBonusTime ? player.Score * 2 : player.Score;
+
         return {
           name: player.Name,
           ip: player.IP,
@@ -26,7 +28,7 @@ export class GameLogEvent implements Event {
           hash: player.Hash,
           kills: player.Kills,
           deaths: player.Deaths,
-          score: isBrazilianBonusTime ? player.Score * 2 : player.Score,
+          score: this.applyKdToScore(baseScore, player.Kills, player.Deaths),
           time: playTime,
         };
       }
@@ -47,7 +49,12 @@ export class GameLogEvent implements Event {
 
       if (clanName) {
         const clan = clanData.find((c) => c.name === clanName);
-        const score = isBrazilianBonusTime ? player.Score * 2 : player.Score;
+        const baseScore = isBrazilianBonusTime ? player.Score * 2 : player.Score;
+        const score = this.applyKdToScore(
+          baseScore,
+          player.Kills,
+          player.Deaths
+        );
 
         if (clan) {
           clan.points += score;
@@ -95,6 +102,20 @@ export class GameLogEvent implements Event {
     ]);
 
     io.emit("gameLog", data);
+  }
+
+  /**
+   * KD < 1 reduz o score com peso alto; KD > 1 aumenta pouco (teto +20%).
+   */
+  private applyKdToScore(baseScore: number, kills: number, deaths: number): number {
+    const kd = deaths === 0 ? (kills > 0 ? 2 : 1) : kills / deaths;
+
+    const multiplier =
+      kd < 1
+        ? 0.15 + 0.85 * kd * kd
+        : 1 + Math.min((kd - 1) * 0.08, 0.2);
+
+    return Math.round(baseScore * multiplier);
   }
 
   private isBetween7amAnd2pm(): boolean {
