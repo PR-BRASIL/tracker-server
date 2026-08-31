@@ -79,11 +79,14 @@ const clanTagList: string[] = [
   "MCMK",
   "BTHP",
   "BRM",
-  "75th'"
+  "75th'",
+  "UBGE",
 ];
 
 const clanAliasMap: Record<string, string> = {
   "=|": "=SF=",
+  UBGEr: "UBGE",
+  "[UBGE]": "UBGE",
 };
 
 export function extractClanName(userName: string): string | null {
