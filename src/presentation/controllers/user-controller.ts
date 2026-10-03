@@ -23,8 +23,12 @@ export class UserController {
       const monthlyCollection = await mongoHelper.getCollection("monthly_user");
       const searchQuery = query.toString();
 
-      // Usando regex mais flexível, similar ao MongoSaveUserDataRepository
-      const regex = new RegExp(searchQuery, "i");
+      // Escapa metacaracteres para nomes com tags tipo [IRF], =SF=, etc.
+      const escapedQuery = searchQuery.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+      const regex = new RegExp(escapedQuery, "i");
 
       // Primeiro, tenta buscar todos que correspondem ao padrão (nome ou hash)
       const users = await collection
@@ -207,12 +211,8 @@ export class UserController {
       let finalUsers: any[] = [];
 
       for (const term of searchTerms) {
-        let regex;
-        try {
-          regex = new RegExp(term, "i");
-        } catch (e) {
-          regex = new RegExp(term.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&"), "i");
-        }
+        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(escapedTerm, "i");
 
         const matchedUsers = await collection
           .find({
